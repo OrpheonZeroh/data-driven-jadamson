@@ -36,20 +36,27 @@ export default async function Home() {
         <p className="text-gray-400 text-lg">
           Multi-domain analytics platform for business intelligence
         </p>
-        <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-800/30 px-4 py-2 rounded-lg border border-gray-800 mt-4">
-          <span>📊</span>
-          <p>
-            <strong>Data Sources:</strong> Public datasets from{' '}
-            <a 
-              href="https://www.kaggle.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-primary-500 hover:text-primary-400 underline"
-            >
-              Kaggle
-            </a>
-            .{' '} Portfolio project – business analytics & strategy showcases
-          </p>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mt-4">
+          <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-800/30 px-4 py-2 rounded-lg border border-gray-800">
+            <span>📊</span>
+            <p>
+              <strong>Data Sources:</strong> Public datasets from{' '}
+              <a 
+                href="https://www.kaggle.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-primary-500 hover:text-primary-400 underline"
+              >
+                Kaggle
+              </a>
+            </p>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-emerald-500 bg-emerald-500/10 px-4 py-2 rounded-lg border border-emerald-500/30">
+            <span>🔄</span>
+            <p>
+              <strong>Last Updated:</strong> {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -146,27 +153,69 @@ function DashboardCard({ title, description, href, icon, color, dataType }: {
   color: string
   dataType: 'historical' | 'snapshot'
 }) {
+  // Define badges and metrics based on dashboard type
+  const dashboardMeta = {
+    'Digital Performance': {
+      badges: ['📅 Time-Series', '🤖 ML-Ready', '💰 ROI Focus'],
+      metric: '4 Channels',
+      cta: 'Explore ROI Analytics →'
+    },
+    'Telco Churn': {
+      badges: ['📸 Snapshot', '⚠️ Predictive', '💎 High-Value'],
+      metric: '7K+ Customers',
+      cta: 'Analyze Churn Risk →'
+    },
+    'Airlines Pricing': {
+      badges: ['📸 Snapshot', '💹 Market Intel', '🔍 Competitive'],
+      metric: '300K+ Flights',
+      cta: 'See Pricing Insights →'
+    },
+    'Retail Analytics': {
+      badges: ['📅 Time-Series', '📊 Multi-Year', '💵 Profitability'],
+      metric: '540K+ Transactions',
+      cta: 'View Sales Trends →'
+    }
+  }[title] || { badges: [], metric: '', cta: 'View Dashboard →' }
+
   return (
     <a
       href={href}
-      className="card card-hover group cursor-pointer relative"
+      className="card card-hover group cursor-pointer relative overflow-hidden"
     >
-      <div className="absolute top-3 right-3">
-        <span className={`px-2 py-1 rounded text-xs font-medium ${
-          dataType === 'historical' 
-            ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' 
-            : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-        }`}>
-          {dataType === 'historical' ? '📅 Time-Series' : '📸 Snapshot'}
-        </span>
+      {/* Badges */}
+      <div className="absolute top-3 right-3 flex flex-col gap-1.5 items-end">
+        {dashboardMeta.badges.map((badge, idx) => (
+          <span 
+            key={idx}
+            className={`px-2 py-1 rounded text-xs font-medium backdrop-blur-sm ${
+              badge.includes('Time-Series') 
+                ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' 
+                : badge.includes('Snapshot')
+                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                : badge.includes('Predictive') || badge.includes('ML-Ready')
+                ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+            }`}
+          >
+            {badge}
+          </span>
+        ))}
       </div>
+      
       <div className="text-4xl mb-4">{icon}</div>
       <h3 className={`text-xl font-bold mb-2 bg-gradient-to-r ${color} bg-clip-text text-transparent`}>
         {title}
       </h3>
-      <p className="text-gray-400 text-sm">{description}</p>
-      <div className="mt-4 flex items-center text-primary-500 text-sm group-hover:translate-x-1 transition-transform">
-        View Dashboard →
+      <p className="text-gray-400 text-sm mb-3">{description}</p>
+      
+      {/* Metric preview */}
+      <div className="flex items-center gap-2 mb-4">
+        <div className="h-1.5 w-1.5 rounded-full bg-primary-500 animate-pulse"></div>
+        <span className="text-xs text-gray-500">{dashboardMeta.metric}</span>
+      </div>
+      
+      <div className="mt-auto flex items-center text-primary-500 text-sm font-medium group-hover:translate-x-1 transition-transform">
+        {dashboardMeta.cta}
       </div>
     </a>
   )
