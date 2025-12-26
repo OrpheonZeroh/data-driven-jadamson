@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase'
 import { LineChart } from '@/components/Charts'
 
 export default function YearOverYear() {
-  const [data, setData] = useState([])
+  const [data, setData] = useState<any[]>([])
 
   useEffect(() => {
     fetchYoYData()
@@ -15,7 +15,7 @@ export default function YearOverYear() {
       .select('*')
       .order('year', { ascending: true })
 
-    if (!error) setData(yearlyData)
+    if (!error && yearlyData) setData(yearlyData)
   }
 
   return (
