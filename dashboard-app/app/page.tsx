@@ -51,12 +51,6 @@ export default async function Home() {
               </a>
             </p>
           </div>
-          <div className="flex items-center gap-2 text-sm text-emerald-500 bg-emerald-500/10 px-4 py-2 rounded-lg border border-emerald-500/30">
-            <span>🔄</span>
-            <p>
-              <strong>Last Updated:</strong> {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-            </p>
-          </div>
         </div>
       </div>
 
