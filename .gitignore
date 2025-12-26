@@ -1,13 +1,11 @@
 # Dependencies
 node_modules/
 dashboard-app/node_modules/
+**/node_modules/
 
 # Next.js
 dashboard-app/.next/
-dashboard-app/out/
-
-# Production
-dashboard-app/build/
+.next/
 
 # Environment variables
 .env
