@@ -23,6 +23,22 @@ export default function Footer() {
               Data-Driven Analytics Dashboard
             </p>
           </div>
+
+          {/* Repository Link */}
+          <div className="text-center md:text-right">
+            <a
+              href="https://github.com/OrpheonZeroh/data-driven-jadamson"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
+            >
+              <Github className="h-4 w-4" />
+              <span>View Source Code</span>
+            </a>
+            <p className="text-gray-600 text-xs mt-1">
+              Open Source • Portfolio Project
+            </p>
+          </div>
         </div>
       </div>
     </footer>
