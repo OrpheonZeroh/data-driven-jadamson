@@ -30,10 +30,10 @@ export default async function Home() {
     <div className="space-y-8">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
           Data-Driven Analytics Dashboard
         </h1>
-        <p className="text-gray-400 text-lg">
+        <p className="text-gray-400 text-sm sm:text-base md:text-lg">
           Multi-domain analytics platform for business intelligence
         </p>
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mt-4">
@@ -101,7 +101,7 @@ export default async function Home() {
       </div>
 
       {/* Dashboard Links */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-8 sm:mt-12">
         <DashboardCard
           title="Digital Performance"
           description="Marketing attribution, ROI, and customer acquisition analytics"
@@ -177,11 +177,11 @@ function DashboardCard({ title, description, href, icon, color, dataType }: {
       className="card card-hover group cursor-pointer relative overflow-hidden"
     >
       {/* Badges */}
-      <div className="absolute top-3 right-3 flex flex-col gap-1.5 items-end">
+      <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex flex-col gap-1 sm:gap-1.5 items-end">
         {dashboardMeta.badges.map((badge, idx) => (
           <span 
             key={idx}
-            className={`px-2 py-1 rounded text-xs font-medium backdrop-blur-sm ${
+            className={`px-1.5 py-0.5 sm:px-2 sm:py-1 rounded text-[10px] sm:text-xs font-medium backdrop-blur-sm ${
               badge.includes('Time-Series') 
                 ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' 
                 : badge.includes('Snapshot')
@@ -196,19 +196,19 @@ function DashboardCard({ title, description, href, icon, color, dataType }: {
         ))}
       </div>
       
-      <div className="text-4xl mb-4">{icon}</div>
-      <h3 className={`text-xl font-bold mb-2 bg-gradient-to-r ${color} bg-clip-text text-transparent`}>
+      <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">{icon}</div>
+      <h3 className={`text-lg sm:text-xl font-bold mb-2 bg-gradient-to-r ${color} bg-clip-text text-transparent`}>
         {title}
       </h3>
-      <p className="text-gray-400 text-sm mb-3">{description}</p>
+      <p className="text-gray-400 text-xs sm:text-sm mb-3 line-clamp-2">{description}</p>
       
       {/* Metric preview */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-2 mb-3 sm:mb-4">
         <div className="h-1.5 w-1.5 rounded-full bg-primary-500 animate-pulse"></div>
         <span className="text-xs text-gray-500">{dashboardMeta.metric}</span>
       </div>
       
-      <div className="mt-auto flex items-center text-primary-500 text-sm font-medium group-hover:translate-x-1 transition-transform">
+      <div className="mt-auto flex items-center text-primary-500 text-xs sm:text-sm font-medium group-hover:translate-x-1 transition-transform">
         {dashboardMeta.cta}
       </div>
     </a>

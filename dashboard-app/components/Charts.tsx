@@ -52,12 +52,16 @@ export function LineChart({ data, xKey, yKey, color = '#0ea5e9' }: LineChartProp
         <XAxis 
           dataKey={xKey} 
           stroke="#9ca3af"
-          style={{ fontSize: '12px' }}
+          style={{ fontSize: '10px' }}
+          angle={-45}
+          textAnchor="end"
+          height={60}
         />
         <YAxis 
           stroke="#9ca3af"
-          style={{ fontSize: '12px' }}
+          style={{ fontSize: '10px' }}
           tickFormatter={(value) => smartFormat(value, yKey)}
+          width={60}
         />
         <Tooltip 
           contentStyle={{ 
@@ -94,12 +98,16 @@ export function BarChart({ data, xKey, yKey, color = '#10b981' }: BarChartProps)
         <XAxis 
           dataKey={xKey} 
           stroke="#9ca3af"
-          style={{ fontSize: '12px' }}
+          style={{ fontSize: '10px' }}
+          angle={-45}
+          textAnchor="end"
+          height={60}
         />
         <YAxis 
           stroke="#9ca3af"
-          style={{ fontSize: '12px' }}
+          style={{ fontSize: '10px' }}
           tickFormatter={(value) => smartFormat(value, yKey)}
+          width={60}
         />
         <Tooltip 
           contentStyle={{ 
@@ -175,6 +183,7 @@ export function PieChart({ data }: PieChartProps) {
           labelLine={false}
           label={(props: any) => {
             const { name, percent } = props
+            const isMobile = typeof window !== 'undefined' && window.innerWidth < 640
             return (
               <text
                 x={props.x}
@@ -182,13 +191,13 @@ export function PieChart({ data }: PieChartProps) {
                 fill="#ffffff"
                 textAnchor={props.x > props.cx ? 'start' : 'end'}
                 dominantBaseline="central"
-                style={{ fontSize: '12px', fontWeight: 500 }}
+                style={{ fontSize: isMobile ? '10px' : '12px', fontWeight: 500 }}
               >
                 {`${name} ${((percent || 0) * 100).toFixed(0)}%`}
               </text>
             )
           }}
-          outerRadius={80}
+          outerRadius={typeof window !== 'undefined' && window.innerWidth < 640 ? 60 : 80}
           fill="#8884d8"
           dataKey="value"
         >

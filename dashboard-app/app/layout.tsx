@@ -12,6 +12,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Data-Driven Analytics Dashboard",
   description: "Multi-domain analytics platform for Retail, Airlines, Telco, and Fraud Detection",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
 };
 
 export default function RootLayout({
@@ -24,7 +25,7 @@ export default function RootLayout({
       <body className={`${inter.variable} antialiased`}>
         <div className="min-h-screen bg-background flex flex-col">
           <Navigation />
-          <main className="container mx-auto px-4 py-8 flex-grow">
+          <main className="container mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 flex-grow">
             {children}
           </main>
           <Footer />

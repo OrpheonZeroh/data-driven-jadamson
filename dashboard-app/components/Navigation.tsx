@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { BarChart3, ShoppingCart, Plane, Phone, Home, TrendingUp } from 'lucide-react'
+import { BarChart3, ShoppingCart, Plane, Phone, Home, TrendingUp, Menu, X } from 'lucide-react'
+import { useState } from 'react'
 
 const navItems = [
   { name: 'Home', href: '/', icon: Home },
@@ -14,19 +15,22 @@ const navItems = [
 
 export default function Navigation() {
   const pathname = usePathname()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
     <nav className="border-b border-gray-800 bg-black/50 backdrop-blur-sm sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
+          {/* Logo */}
           <div className="flex items-center space-x-2">
-            <BarChart3 className="h-8 w-8 text-primary-500" />
-            <span className="text-xl font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
+            <BarChart3 className="h-6 w-6 sm:h-8 sm:w-8 text-primary-500" />
+            <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
               Data Analytics
             </span>
           </div>
           
-          <div className="flex space-x-1">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex space-x-1">
             {navItems.map((item) => {
               const isActive = pathname === item.href
               const Icon = item.icon
@@ -49,7 +53,44 @@ export default function Navigation() {
               )
             })}
           </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
         </div>
+
+        {/* Mobile Navigation */}
+        {mobileMenuOpen && (
+          <div className="md:hidden pb-4 space-y-1">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href
+              const Icon = item.icon
+              
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`
+                    flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200
+                    ${isActive 
+                      ? 'bg-primary-600 text-white' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                    }
+                  `}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span className="font-medium">{item.name}</span>
+                </Link>
+              )
+            })}
+          </div>
+        )}
       </div>
     </nav>
   )
