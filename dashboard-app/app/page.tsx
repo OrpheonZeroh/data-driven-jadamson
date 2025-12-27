@@ -1,14 +1,15 @@
 import { supabase } from '@/lib/supabase'
 import StatCard from '@/components/StatCard'
-import { DollarSign, Plane, Users, TrendingUp, Activity } from 'lucide-react'
+import { DollarSign, Plane, Users, TrendingUp, Activity, Shield } from 'lucide-react'
 
 async function getExecutiveSummary() {
   try {
-    const [digital, retail, airlines, telco] = await Promise.all([
+    const [digital, retail, airlines, telco, fraud] = await Promise.all([
       supabase.from('digital_performance_data').select('*', { count: 'exact', head: true }),
       supabase.from('retail_transactions').select('*', { count: 'exact', head: true }),
       supabase.from('airlines_flights').select('*', { count: 'exact', head: true }),
       supabase.from('telco_customers').select('*', { count: 'exact', head: true }),
+      supabase.from('fraud_transactions').select('*', { count: 'exact', head: true }),
     ])
 
     return {
@@ -16,15 +17,16 @@ async function getExecutiveSummary() {
       retail: retail.count || 0,
       airlines: airlines.count || 0,
       telco: telco.count || 0,
+      fraud: fraud.count || 0,
     }
   } catch (error) {
-    return { digital: 0, retail: 0, airlines: 0, telco: 0 }
+    return { digital: 0, retail: 0, airlines: 0, telco: 0, fraud: 0 }
   }
 }
 
 export default async function Home() {
   const summary = await getExecutiveSummary()
-  const totalRecords = summary.digital + summary.retail + summary.airlines + summary.telco
+  const totalRecords = summary.digital + summary.retail + summary.airlines + summary.telco + summary.fraud
 
   return (
     <div className="space-y-8">
@@ -92,6 +94,13 @@ export default async function Home() {
         />
         
         <StatCard
+          title="Fraud Transactions"
+          value={summary.fraud.toLocaleString()}
+          icon={Shield}
+          description="Security analysis"
+        />
+        
+        <StatCard
           title="Data Quality"
           value="99.8%"
           icon={TrendingUp}
@@ -101,7 +110,7 @@ export default async function Home() {
       </div>
 
       {/* Dashboard Links */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-8 sm:mt-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 mt-8 sm:mt-12">
         <DashboardCard
           title="Digital Performance"
           description="Marketing attribution, ROI, and customer acquisition analytics"
@@ -132,6 +141,14 @@ export default async function Home() {
           href="/retail"
           icon="🛒"
           color="from-blue-500 to-cyan-500"
+          dataType="historical"
+        />
+        <DashboardCard
+          title="Fraud Detection"
+          description="Real-time fraud monitoring and risk pattern analysis"
+          href="/fraud"
+          icon="🛡️"
+          color="from-red-500 to-orange-500"
           dataType="historical"
         />
       </div>
@@ -168,6 +185,11 @@ function DashboardCard({ title, description, href, icon, color, dataType }: {
       badges: ['📅 Time-Series', '📊 Multi-Year', '💵 Profitability'],
       metric: '540K+ Transactions',
       cta: 'View Sales Trends →'
+    },
+    'Fraud Detection': {
+      badges: ['📅 Time-Series', '⚠️ Risk Analysis', '🔒 Security'],
+      metric: '1.7M+ Transactions',
+      cta: 'Analyze Fraud Patterns →'
     }
   }[title] || { badges: [], metric: '', cta: 'View Dashboard →' }
 

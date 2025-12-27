@@ -183,7 +183,6 @@ export function PieChart({ data }: PieChartProps) {
           labelLine={false}
           label={(props: any) => {
             const { name, percent } = props
-            const isMobile = typeof window !== 'undefined' && window.innerWidth < 640
             return (
               <text
                 x={props.x}
@@ -191,13 +190,13 @@ export function PieChart({ data }: PieChartProps) {
                 fill="#ffffff"
                 textAnchor={props.x > props.cx ? 'start' : 'end'}
                 dominantBaseline="central"
-                style={{ fontSize: isMobile ? '10px' : '12px', fontWeight: 500 }}
+                style={{ fontSize: '11px', fontWeight: 500 }}
               >
                 {`${name} ${((percent || 0) * 100).toFixed(0)}%`}
               </text>
             )
           }}
-          outerRadius={typeof window !== 'undefined' && window.innerWidth < 640 ? 60 : 80}
+          outerRadius={70}
           fill="#8884d8"
           dataKey="value"
         >

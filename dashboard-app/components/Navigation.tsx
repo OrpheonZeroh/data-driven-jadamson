@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { BarChart3, ShoppingCart, Plane, Phone, Home, TrendingUp, Menu, X } from 'lucide-react'
+import { BarChart3, ShoppingCart, Plane, Phone, Home, TrendingUp, Menu, X, Shield } from 'lucide-react'
 import { useState } from 'react'
 
 const navItems = [
@@ -11,6 +11,7 @@ const navItems = [
   { name: 'Telco', href: '/telco', icon: Phone },
   { name: 'Airlines', href: '/airlines', icon: Plane },
   { name: 'Retail', href: '/retail', icon: ShoppingCart },
+  { name: 'Fraud', href: '/fraud', icon: Shield },
 ]
 
 export default function Navigation() {

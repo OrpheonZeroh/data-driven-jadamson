@@ -25,24 +25,24 @@ export default function FraudDashboard() {
     try {
       const { data: transactions } = await supabase
         .from('fraud_transactions')
-        .select('timestamp')
-        .order('timestamp', { ascending: true })
+        .select('date')
+        .order('date', { ascending: true })
         .limit(1)
 
       const { data: transactionsMax } = await supabase
         .from('fraud_transactions')
-        .select('timestamp')
-        .order('timestamp', { ascending: false })
+        .select('date')
+        .order('date', { ascending: false })
         .limit(1)
 
       if (transactions?.[0] && transactionsMax?.[0]) {
         setDateLimit({
-          min: transactions[0].timestamp?.split('T')[0] || '',
-          max: transactionsMax[0].timestamp?.split('T')[0] || ''
+          min: transactions[0].date || '',
+          max: transactionsMax[0].date || ''
         })
       }
     } catch (error) {
-      // Silent error handling
+      console.error('Error loading date limits:', error)
     }
   }
 
@@ -56,8 +56,8 @@ export default function FraudDashboard() {
 
       if (dateRange.start && dateRange.end) {
         transactionsQuery = transactionsQuery
-          .gte('timestamp', `${dateRange.start}T00:00:00`)
-          .lte('timestamp', `${dateRange.end}T23:59:59`)
+          .gte('date', dateRange.start)
+          .lte('date', dateRange.end)
       }
 
       const { data: transactions } = await transactionsQuery
@@ -80,9 +80,12 @@ export default function FraudDashboard() {
 
       const totalTransactions = transactions?.length || 0
       const fraudulentTxns = transactions?.filter(t => t.is_fraud === 1).length || 0
-      const fraudRate = (fraudulentTxns / totalTransactions) * 100
+      const legitimateTxns = transactions?.filter(t => t.is_fraud === 0).length || 0
+      const fraudRate = totalTransactions > 0 ? (fraudulentTxns / totalTransactions) * 100 : 0
       const totalAmount = transactions?.reduce((sum, t) => sum + (t.amount || 0), 0) || 0
       const fraudAmount = transactions?.filter(t => t.is_fraud === 1)
+        .reduce((sum, t) => sum + (t.amount || 0), 0) || 0
+      const legitimateAmount = transactions?.filter(t => t.is_fraud === 0)
         .reduce((sum, t) => sum + (t.amount || 0), 0) || 0
 
       const categoryFraud = transactions?.reduce((acc: any, t) => {
@@ -134,8 +137,11 @@ export default function FraudDashboard() {
 
       setData({
         totalTransactions,
+        fraudulentTxns,
+        legitimateTxns,
         fraudRate: fraudRate.toFixed(2),
         fraudAmount,
+        legitimateAmount,
         totalAmount,
         categoryChartData,
         topRiskyMerchants,
@@ -163,10 +169,19 @@ export default function FraudDashboard() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
+      {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Fraud Detection Analytics</h1>
-        <p className="text-gray-400">Real-time fraud monitoring and pattern analysis</p>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">Fraud Detection Analytics</h1>
+        <p className="text-gray-400 text-sm sm:text-base">Real-time fraud monitoring and pattern analysis</p>
+        {dateLimit.min && dateLimit.max && (
+          <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-gray-800/50 rounded-lg border border-gray-700">
+            <span className="text-xs text-gray-500">📅 Data Range:</span>
+            <span className="text-xs font-medium text-white">{dateLimit.min}</span>
+            <span className="text-xs text-gray-500">to</span>
+            <span className="text-xs font-medium text-white">{dateLimit.max}</span>
+          </div>
+        )}
       </div>
 
       <DateFilter 
@@ -176,7 +191,8 @@ export default function FraudDashboard() {
         maxDate={dateLimit.max}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <StatCard
           title="Transactions Analyzed"
           value={data.totalTransactions.toLocaleString()}
@@ -189,20 +205,28 @@ export default function FraudDashboard() {
           trend={{ value: '0.3%', isPositive: false }}
         />
         <StatCard
-          title="Fraud Amount"
+          title="Fraud Detected"
           value={`$${(data.fraudAmount / 1000000).toFixed(1)}M`}
-          icon={DollarSign}
+          icon={AlertTriangle}
+          description={`${data.fraudulentTxns.toLocaleString()} fraudulent txns`}
         />
         <StatCard
-          title="Protected Amount"
-          value={`$${((data.totalAmount - data.fraudAmount) / 1000000).toFixed(1)}M`}
+          title="Legitimate Amount"
+          value={`$${(data.legitimateAmount / 1000000).toFixed(1)}M`}
           icon={Shield}
+          description={`${data.legitimateTxns.toLocaleString()} clean txns`}
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Primary Analysis: Risk Patterns */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold text-white">🎯 Risk Pattern Analysis</h2>
+        <p className="text-sm text-gray-400">Identifying high-risk patterns across categories, time, and geography</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <div className="card">
-          <h3 className="text-lg font-semibold text-white mb-4">Fraud Rate by Merchant Category</h3>
+          <h3 className="text-base sm:text-lg font-semibold text-white mb-4">Fraud Rate by Merchant Category</h3>
           {data.categoryChartData.length > 0 ? (
             <BarChart 
               data={data.categoryChartData}
@@ -216,7 +240,7 @@ export default function FraudDashboard() {
         </div>
 
         <div className="card">
-          <h3 className="text-lg font-semibold text-white mb-4">Fraud by Card Type</h3>
+          <h3 className="text-base sm:text-lg font-semibold text-white mb-4">Fraud Distribution by Card Type</h3>
           {data.cardTypeChartData.length > 0 ? (
             <PieChart data={data.cardTypeChartData} />
           ) : (
@@ -225,7 +249,8 @@ export default function FraudDashboard() {
         </div>
 
         <div className="card lg:col-span-2">
-          <h3 className="text-lg font-semibold text-white mb-4">Hourly Fraud Pattern</h3>
+          <h3 className="text-base sm:text-lg font-semibold text-white mb-4">⏰ Hourly Fraud Pattern</h3>
+          <p className="text-xs sm:text-sm text-gray-400 mb-4">Fraud activity peaks during specific hours - use this for targeted monitoring</p>
           {data.hourlyData.length > 0 ? (
             <LineChart 
               data={data.hourlyData}
@@ -237,9 +262,17 @@ export default function FraudDashboard() {
             <p className="text-gray-500 text-center py-8">No data available</p>
           )}
         </div>
+      </div>
 
+      {/* Secondary Analysis: Merchant & Geography Risk */}
+      <div className="space-y-4 mt-8">
+        <h2 className="text-xl font-bold text-white">🏪 Merchant & Geographic Risk</h2>
+        <p className="text-sm text-gray-400">Top risky merchants and countries requiring immediate attention</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <div className="card">
-          <h3 className="text-lg font-semibold text-white mb-4">High-Risk Merchants</h3>
+          <h3 className="text-base sm:text-lg font-semibold text-white mb-4">High-Risk Merchants</h3>
           {data.topRiskyMerchants.length > 0 ? (
             <BarChart 
               data={data.topRiskyMerchants}
@@ -253,7 +286,7 @@ export default function FraudDashboard() {
         </div>
 
         <div className="card">
-          <h3 className="text-lg font-semibold text-white mb-4">Fraud Rate by Country</h3>
+          <h3 className="text-base sm:text-lg font-semibold text-white mb-4">Fraud Rate by Country</h3>
           {data.countryRiskData.length > 0 ? (
             <BarChart 
               data={data.countryRiskData}
@@ -267,8 +300,10 @@ export default function FraudDashboard() {
         </div>
       </div>
 
+      {/* Detailed Merchant Analysis */}
       <div className="card">
-        <h3 className="text-lg font-semibold text-white mb-4">Top 10 High-Risk Merchants</h3>
+        <h3 className="text-base sm:text-lg font-semibold text-white mb-4">📊 Top 10 High-Risk Merchants - Detailed View</h3>
+        <p className="text-xs sm:text-sm text-gray-400 mb-4">Merchants with highest fraud rates requiring enhanced monitoring and verification</p>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -312,9 +347,14 @@ export default function FraudDashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Key Insights */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold text-white">💡 Key Insights & Recommendations</h2>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="card border-error/50">
-          <h4 className="text-sm font-semibold text-error mb-2">Highest Risk Category</h4>
+          <h4 className="text-xs sm:text-sm font-semibold text-error mb-2">🚨 Highest Risk Category</h4>
           <p className="text-2xl font-bold text-white">
             {data.categoryChartData[0]?.name || 'N/A'}
           </p>
@@ -324,7 +364,7 @@ export default function FraudDashboard() {
         </div>
         
         <div className="card border-warning/50">
-          <h4 className="text-sm font-semibold text-warning mb-2">Peak Fraud Hour</h4>
+          <h4 className="text-xs sm:text-sm font-semibold text-warning mb-2">⏰ Peak Fraud Hour</h4>
           <p className="text-2xl font-bold text-white">
             {data.hourlyData.reduce((max: any, curr: any) => 
               parseFloat(curr['Fraud Rate']) > parseFloat(max['Fraud Rate']) ? curr : max
@@ -334,7 +374,7 @@ export default function FraudDashboard() {
         </div>
         
         <div className="card border-success/50">
-          <h4 className="text-sm font-semibold text-success mb-2">Detection Rate</h4>
+          <h4 className="text-xs sm:text-sm font-semibold text-success mb-2">✅ Detection Rate</h4>
           <p className="text-2xl font-bold text-white">
             {(100 - parseFloat(data.fraudRate)).toFixed(1)}%
           </p>
