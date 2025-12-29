@@ -8,7 +8,7 @@ export default function Footer() {
           {/* Creator Info */}
           <div className="text-center md:text-left">
             <p className="text-gray-400 text-sm">
-              Hecho por{' '}
+              Built by{' '}
               <a
                 href="https://www.linkedin.com/in/jonathan-albert-adamson-gondola-57145084/"
                 target="_blank"
